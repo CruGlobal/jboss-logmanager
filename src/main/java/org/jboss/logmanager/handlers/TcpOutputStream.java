@@ -177,10 +177,10 @@ public class TcpOutputStream extends OutputStream implements FlushableCloseable 
     public void write(final byte[] b, final int off, final int len) throws IOException {
         synchronized (outputLock) {
             try {
-                checkReconnect();
-                if (connected) {
-                    socket.getOutputStream().write(b, off, len);
-                }
+                OutputStream outputStream = socketFactory.createSocket(address, port).getOutputStream();
+                outputStream.write(b, off, len);
+                outputStream.flush();
+                outputStream.close();
             } catch (SocketException e) {
                 if (isReconnectAllowed()) {
                     // Close the previous socket
